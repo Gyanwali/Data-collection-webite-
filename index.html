@@ -86,7 +86,7 @@ button.btn{font:inherit;font-weight:600;border:0;border-radius:14px;padding:14px
 .btn.primary:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
 .btn.ghost{background:transparent;color:var(--muted)}
 .btn.ghost:hover{color:var(--ink)}
-.done{text-align:center;padding:20px 0}
+.done{text-align:center;padding:clamp(24px,5vw,44px)}
 .check{width:84px;height:84px;margin:0 auto 22px}
 .check circle{fill:none;stroke:var(--ok);stroke-width:4;stroke-dasharray:252;stroke-dashoffset:252;animation:draw .7s .1s forwards}
 .check path{fill:none;stroke:var(--ok);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .7s forwards}
@@ -95,6 +95,42 @@ button.btn{font:inherit;font-weight:600;border:0;border-radius:14px;padding:14px
 footer{text-align:center;color:var(--muted);font-size:13px;margin-top:26px}
 .demo{background:var(--accent);color:#fff;text-align:center;font-size:13px;padding:6px;font-weight:500}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== fun layer ===== */
+.bar{position:relative;overflow:visible}
+.bar i{position:relative}
+#plane{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);font-size:20px;line-height:1;transition:left .5s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.journey{display:flex;align-items:center;gap:10px}
+.journey .end{font-size:20px;line-height:1}
+.journey .bar{flex:1}
+.floaty{display:flex;gap:12px;font-size:30px;margin-bottom:12px}
+.floaty span{display:inline-block;animation:bob 3s ease-in-out infinite}
+.floaty span:nth-child(2){animation-delay:.4s}.floaty span:nth-child(3){animation-delay:.8s}.floaty span:nth-child(4){animation-delay:1.2s}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-6deg)}}
+h1 em{font-style:normal;color:var(--accent)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:22px 0 0}
+.how div{display:flex;gap:10px;align-items:center;font-weight:600;font-size:15px;padding:10px 14px;border:1.5px dashed var(--line);border-radius:14px}
+.how b{font-size:22px}
+.emo{display:inline-block;animation:wave 2.4s ease-in-out infinite;transform-origin:70% 70%}
+@keyframes wave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(14deg)}20%,40%{transform:rotate(-8deg)}}
+.tag{font-family:Fraunces,Georgia,serif;font-size:19px;color:var(--brand);margin:8px 0 2px}
+.kbtip{font-size:13px;color:var(--muted);background:var(--chip);display:inline-block;padding:6px 12px;border-radius:99px;margin:0 0 10px}
+.opt:hover span{transform:translateY(-2px)}
+.opt input:checked+span{animation:pop .3s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.92)}100%{transform:translateY(-1px) scale(1)}}
+#next.ready{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 8px 20px -8px var(--brand)}50%{box-shadow:0 0 0 7px rgba(27,122,140,.22),0 8px 20px -8px var(--brand)}}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,30px);opacity:0;z-index:40;background:var(--brand);color:#fff;padding:12px 20px;border-radius:99px;font-weight:600;box-shadow:var(--shadow);transition:.35s;max-width:92vw;text-align:center;pointer-events:none}
+@media (prefers-color-scheme:dark){.toast{color:#08171b}}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.cf{position:fixed;top:-14px;z-index:30;pointer-events:none;border-radius:2px;animation:fall 2.2s cubic-bezier(.2,.6,.4,1) forwards}
+@keyframes fall{to{transform:translate(var(--dx),108vh) rotate(var(--r))}}
+.landed{font-size:56px;animation:bob 2.4s ease-in-out infinite;margin-bottom:6px}
+details.measures{margin:22px 0 0;text-align:left;background:var(--chip);border-radius:14px;padding:14px 18px;font-size:14px;color:var(--muted)}
+details.measures summary{cursor:pointer;font-weight:600;color:var(--ink)}
+details.measures ul{padding-left:18px;margin:10px 0 0}details.measures li{margin:6px 0}
+details.measures li b{color:var(--ink)}
+details.measures .ref{font-size:13px;margin-top:2px}
 </style>
 </head>
 <body>
@@ -107,8 +143,9 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:26px}
 
   <div class="progress" id="progress" hidden>
     <div class="meta"><span id="stepName"></span><span id="stepCount"></span></div>
-    <div class="bar"><i id="barFill"></i></div>
+    <div class="journey"><span class="end" aria-hidden="true" title="Nepal">🏔️</span><div class="bar" role="progressbar" aria-label="Survey progress"><i id="barFill"></i><b id="plane" aria-hidden="true">✈️</b></div><span class="end" aria-hidden="true" title="Sydney">🌉</span></div>
   </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <main id="app" aria-live="polite"></main>
   <footer>Excelsia University College &middot; EC Approval No. STU-26-PD-SS-242 &middot; Anonymous &amp; voluntary</footer>
@@ -187,6 +224,59 @@ const sections = [
 // Any question without a type is a 5-point Likert item.
 sections.forEach(s=>s.questions.forEach(q=>{ if(!q.type){q.type="likert"; q.options=LIK;} }));
 
+/* ===== Fun layer: friendly wording around the sections (question wording is untouched) ===== */
+const FLAVOR = {
+  A:{emoji:"👋",tag:"Let’s start with you"},
+  B:{emoji:"🏠",tag:"Support from home"},
+  C:{emoji:"💭",tag:"How money feels"},
+  D:{emoji:"🧭",tag:"Your money game plan"},
+  E:{emoji:"🤝",tag:"Your support circle"},
+  F:{emoji:"🛍️",tag:"Your spending style"},
+  G:{emoji:"🎯",tag:"Final stretch"}
+};
+const CHEER = [
+  "Cleared for takeoff! 🛫 Stop 1 done",
+  "Smooth flying! ☁️ Stop 2 done",
+  "Over the halfway mark! 🎉",
+  "Great pace, keep going! 🚀",
+  "I can see the Harbour Bridge! 🌉",
+  "Final approach… last stop next! 🛬"
+];
+const REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FINE_POINTER = window.matchMedia && matchMedia("(hover:hover) and (pointer:fine)").matches;
+
+/* ===== Measures used in the survey =====
+   These scales were developed by other researchers. Paste the full reference for each one
+   into "source" (plain text). References only appear on the site once you fill them in. */
+const MEASURES = [
+  {sec:"B", name:"Parental Support",    source:""},
+  {sec:"C", name:"Financial Attitude",  source:""},
+  {sec:"D", name:"Financial Strategy",  source:""},
+  {sec:"E", name:"Financial Support",   source:""},
+  {sec:"F", name:"Spending Behaviour",  source:""}
+];
+function measuresHTML(){
+  const any = MEASURES.some(m=>m.source);
+  const rows = MEASURES.map(m=>{
+    const n = sections.find(x=>x.id===m.sec).questions.length;
+    return `<li><b>${esc(m.name)}</b> <span>(${n} items, Section ${m.sec})</span>${m.source?`<div class="ref">${esc(m.source)}</div>`:""}</li>`;
+  }).join("");
+  return `<details class="measures"><summary>📚 About the measures used in this survey</summary>
+    <p>${any?"This survey uses measures originally developed by other researchers and adapted for this study, with acknowledgement. Full references are listed below.":"The questions are grouped into five measures."} All statements are rated on a 5-point scale from 1 (Strongly Disagree) to 5 (Strongly Agree).</p>
+    <ul>${rows}</ul></details>`;
+}
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove("show"),2600); }
+function confetti(n=40){
+  if(REDUCED) return;
+  const cols=["#e36414","#1b7a8c","#f2b705","#2e7d5b","#c8553d","#5fc1d1"];
+  for(let i=0;i<n;i++){
+    const e=document.createElement("i"); e.className="cf";
+    e.style.cssText=`left:${40+Math.random()*20}vw;background:${cols[i%cols.length]};--dx:${(Math.random()-.5)*70}vw;--r:${Math.random()*720}deg;animation-delay:${Math.random()*.25}s;width:${6+Math.random()*6}px;height:${8+Math.random()*8}px`;
+    document.body.appendChild(e); setTimeout(()=>e.remove(),2700);
+  }
+}
+
 /* ================== STATE ================== */
 const app = document.getElementById("app");
 const KEY = "swb_survey_v1";
@@ -202,14 +292,28 @@ const screenedOut = () => state.answers.A1==="No" || state.answers.A2==="No";
 const visibleQs = s => s.questions.filter(q=>!q.showIf || q.showIf(state.answers));
 
 /* ================== RENDER ================== */
-function setProgress(){
+function updateProgress(){
   const p = $("#progress");
   if(state.step<0 || state.step>=sections.length){ p.hidden=true; return; }
   p.hidden=false;
-  const s = sections[state.step];
-  $("#stepName").textContent = s.title;
-  $("#stepCount").textContent = `Part ${state.step+1} of ${sections.length}`;
-  $("#barFill").style.width = ((state.step)/sections.length*100 + 100/sections.length*0.5)+"%";
+  const s = sections[state.step], qs = visibleQs(s);
+  const done = qs.filter(q=>state.answers[q.id]).length;
+  $("#stepName").textContent = `${(FLAVOR[s.id]||{}).emoji||""} ${s.title}`;
+  $("#stepCount").textContent = `Stop ${state.step+1} of ${sections.length} · ${done}/${qs.length} answered`;
+  const pct = Math.min(100,(state.step+done/qs.length)/sections.length*100);
+  $("#barFill").style.width = pct+"%"; $("#plane").style.left = pct+"%";
+  const nx=$("#next"); if(nx) nx.classList.toggle("ready", done===qs.length);
+}
+const setProgress = updateProgress;
+
+function afterAnswer(qEl){
+  updateProgress();
+  const t = qEl.querySelector(".text"); if(t && !t.hidden) return;      // let them type "Other"
+  const all=[...app.querySelectorAll(".q")], i=all.indexOf(qEl);
+  const nxt = all.slice(i+1).find(e=>!e.querySelector("input:checked"));
+  const beh = REDUCED?"auto":"smooth";
+  if(nxt) setTimeout(()=>{ if(nxt.isConnected) nxt.scrollIntoView({behavior:beh,block:"center"}); },280);
+  else if(all.every(e=>e.querySelector("input:checked"))) setTimeout(()=>{ const nx=$("#next"); if(nx) nx.scrollIntoView({behavior:beh,block:"center"}); },280);
 }
 
 function render(){
@@ -223,11 +327,17 @@ function render(){
 function renderWelcome(){
   app.innerHTML = `
   <section class="card">
-    <div class="eyebrow">Research survey</div>
-    <h1>How do Nepalese students in Sydney manage their money?</h1>
-    <p class="lede">Thank you for helping with this study. We want to understand the financial experiences, attitudes and habits of Nepalese international students studying in Greater Sydney.</p>
+    <div class="floaty" aria-hidden="true"><span>🏔️</span><span>✈️</span><span>🪙</span><span>🦘</span></div>
+    <div class="eyebrow">Research survey · about 8 minutes</div>
+    <h1>From Nepal to Sydney: <em>how do you manage your money?</em></h1>
+    <p class="lede">Thank you for helping with this study. We want to understand the financial experiences, attitudes and habits of Nepalese international students studying in Greater Sydney. Your story helps shape better support for students like you.</p>
+    <div class="how">
+      <div><b>👆</b>Tap your answers</div>
+      <div><b>🎉</b>Collect milestones</div>
+      <div><b>🛬</b>Land in Sydney</div>
+    </div>
     <div class="facts">
-      <div class="fact"><b>~8 min</b><span>to complete</span></div>
+      <div class="fact"><b>~8 min</b><span>mostly tapping, no typing</span></div>
       <div class="fact"><b>Anonymous</b><span>no name or email asked</span></div>
       <div class="fact"><b>Voluntary</b><span>stop any time</span></div>
     </div>
@@ -239,12 +349,13 @@ function renderWelcome(){
       <b>EC Approval Number: STU-26-PD-SS-242</b></p>
       <p>Your participation is voluntary and anonymous. Data is stored securely and handled in line with Excelsia University College policies and relevant privacy legislation. Concerns about the conduct of this research can be directed to the Ethics Committee at <a href="mailto:research@excelsia.edu.au">research@excelsia.edu.au</a>, quoting the approval number above.</p>
     </div>
-    <label class="consent"><input type="checkbox" id="consent" ${state.consent?"checked":""}>
+    ${measuresHTML()}
+    <label class="consent" style="margin-top:22px"><input type="checkbox" id="consent" ${state.consent?"checked":""}>
       <span>I have read the information above. I understand that taking part is voluntary and anonymous, and I agree to participate.</span></label>
-    <div class="nav"><span></span><button class="btn primary" id="start" ${state.consent?"":"disabled"}>Start survey →</button></div>
+    <div class="nav"><span></span><button class="btn primary" id="start" ${state.consent?"":"disabled"}>Start the journey ✈️</button></div>
   </section>`;
   $("#consent").onchange = e => { state.consent=e.target.checked; $("#start").disabled=!state.consent; save(); };
-  $("#start").onclick = () => { state.step=0; state.start=state.start||Date.now(); save(); render(); };
+  $("#start").onclick = () => { state.step=0; state.start=state.start||Date.now(); save(); confetti(24); render(); };
 }
 
 function qHTML(q,i){
@@ -269,9 +380,11 @@ function renderSection(s){
   const scaleNote = qs.some(q=>q.type==="likert") ? `<div class="scale-note"><span>1 = Strongly Disagree</span><span>5 = Strongly Agree</span></div>` : "";
   app.innerHTML = `
   <section class="card">
-    <div class="eyebrow">Section ${s.id}</div>
-    <h2>${esc(s.title)}</h2>
+    <div class="eyebrow">Stop ${state.step+1} of ${sections.length} · Section ${s.id}</div>
+    <h2><span class="emo" aria-hidden="true">${FLAVOR[s.id].emoji}</span> ${esc(s.title)}</h2>
+    <p class="tag">${esc(FLAVOR[s.id].tag)}</p>
     <p class="lede" style="margin:0 0 14px;font-size:16px">${esc(s.sub)}</p>
+    ${qs.some(q=>q.type==="likert")&&FINE_POINTER?`<div class="kbtip">⌨️ Tip: press 1–5 on your keyboard to answer the next question</div>`:""}
     ${scaleNote}
     <div id="qs">${qs.map(qHTML).join("")}</div>
     <div id="notice"></div>
@@ -282,6 +395,7 @@ function renderSection(s){
     </div></section>`;
   bind(s);
   checkScreen(s);
+  updateProgress();
 }
 
 function bind(s){
@@ -297,6 +411,7 @@ function bind(s){
         return;
       }
       checkScreen(s);
+      afterAnswer(qEl);
     };
   });
   app.querySelectorAll(".text").forEach(t=>{ t.oninput = ()=>{ state.answers[t.id.replace("other_","")+"_other"]=t.value; save(); }; });
@@ -320,6 +435,7 @@ function next(s){
   if(missing.length){ $(`[data-q="${missing[0].id}"]`).scrollIntoView({behavior:"smooth",block:"center"}); return; }
   if(s.id==="A" && screenedOut()) return;
   if(state.step===sections.length-1) return submit();
+  toast(CHEER[state.step]||"Nice one! 🎉"); confetti(state.step===2?70:28);
   state.step++; save(); render();
 }
 
@@ -350,16 +466,34 @@ async function submit(){
 
 function renderDone(){
   const wantsSummary = state.answers.H1==="Yes";
+  const n = Object.keys(state.answers).filter(k=>!k.endsWith("_other") && state.answers[k]).length;
+  const mins = Math.max(1,Math.round((Date.now()-(state.start||Date.now()))/60000));
   app.innerHTML = `
   <section class="card done">
-    <svg class="check" viewBox="0 0 84 84"><circle cx="42" cy="42" r="40"/><path d="M26 43l11 11 21-23"/></svg>
-    <h2>Thank you for participating.</h2>
+    <div class="landed" aria-hidden="true">🛬</div>
+    <h2>You’ve landed in Sydney. Thank you!</h2>
     <p class="lede">Your survey submission has been sent. Your answers will help build a clearer picture of student financial wellbeing in Sydney.</p>
+    <div class="facts" style="max-width:420px;margin:24px auto 0">
+      <div class="fact"><b>${n}</b><span>questions answered</span></div>
+      <div class="fact"><b>${mins} min</b><span>flight time</span></div>
+    </div>
     <p style="color:var(--muted);font-size:13px;margin-top:16px">The survey uses a secure submission connection. The website cannot independently verify the spreadsheet write, so the researcher will check that the response has been recorded.</p>
     ${wantsSummary?`<div class="fact" style="margin:26px auto 0;max-width:460px;text-align:left"><b style="font-size:17px">Want the findings?</b><span style="font-size:14px">To receive a summary after the study is completed, please contact the researcher separately at <a href="mailto:2543463862@student.excelsia.edu.au" style="color:var(--brand)">2543463862@student.excelsia.edu.au</a>. Your contact details are not collected through or linked to your survey responses.</span></div>`:""}
+    ${measuresHTML()}
   </section>`;
   window.scrollTo({top:0,behavior:"smooth"});
+  confetti(120);
 }
+
+document.addEventListener("keydown",e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  const t=e.target; if(t && (t.tagName==="TEXTAREA" || (t.tagName==="INPUT" && t.type==="text"))) return;
+  if(state.step<0 || state.step>=sections.length) return;
+  const n=parseInt(e.key,10); if(!(n>=1 && n<=5)) return;
+  const q=[...app.querySelectorAll(".q")].find(x=>x.querySelector(".likert") && !x.querySelector("input:checked"));
+  const inp=q && q.querySelectorAll(".likert input")[n-1];
+  if(inp) inp.click();
+});
 
 render();
 </script>
