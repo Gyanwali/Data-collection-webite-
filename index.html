@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Financial Wellbeing Survey | Excelsia University College</title>
+<meta name="description" content="An anonymous survey for Nepalese international students in Greater Sydney.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f1e9; --card:#fffdf9; --ink:#17262b; --muted:#5d6e73; --line:#e4dccf;
+  --brand:#0f4c5c; --brand-2:#1b7a8c; --accent:#e36414; --ok:#2e7d5b; --err:#b3261e;
+  --chip:#f1ebe0; --chip-hover:#e8dfcf; --shadow:0 1px 2px rgba(23,38,43,.05),0 12px 32px -12px rgba(23,38,43,.18);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e1a1e; --card:#15262b; --ink:#eef3f2; --muted:#9bb0b4; --line:#26393f;
+  --brand:#5fc1d1; --brand-2:#3a9fb2; --accent:#ff8a3d; --ok:#5fcf9f; --err:#ff8a80;
+  --chip:#1c3238; --chip-hover:#25414a; --shadow:0 12px 32px -12px rgba(0,0,0,.6);}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif;
+  background-image:radial-gradient(1200px 500px at 85% -10%,rgba(27,122,140,.16),transparent 60%),radial-gradient(900px 400px at -10% 10%,rgba(227,100,20,.10),transparent 60%);
+  background-attachment:fixed;min-height:100vh}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01em;line-height:1.15;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 80px}
+header.top{display:flex;align-items:center;gap:10px;padding:22px 0 8px;color:var(--brand);font-weight:600}
+header.top svg{width:26px;height:26px}
+.progress{position:sticky;top:0;z-index:5;padding:10px 0 12px;background:linear-gradient(var(--bg) 70%,transparent)}
+.progress .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand-2),var(--accent));border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:clamp(20px,4vw,40px);animation:rise .45s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:10px}
+h1{font-size:clamp(30px,6vw,46px)}
+h2{font-size:clamp(24px,4.5vw,32px);margin-bottom:6px}
+.lede{color:var(--muted);margin:14px 0 0;font-size:17px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0}
+.fact{background:var(--chip);border-radius:14px;padding:14px 16px}
+.fact b{display:block;font-family:Fraunces,serif;font-size:22px;color:var(--brand)}
+.fact span{font-size:13px;color:var(--muted)}
+.about{background:var(--chip);border-radius:14px;padding:16px 20px;margin:0 0 22px;font-size:14px;color:var(--muted)}
+.about h3{font-size:17px;color:var(--ink);margin-bottom:8px}
+.about p{margin:0 0 10px}.about p:last-child{margin:0}.about b{color:var(--ink)}.about a{color:var(--brand)}
+.consent{display:flex;gap:12px;align-items:flex-start;margin:6px 0 22px;font-size:15px;cursor:pointer}
+.consent input{margin-top:4px;width:20px;height:20px;accent-color:var(--brand);flex:none}
+.q{padding:22px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0;padding-top:8px}
+.q .label{font-weight:600;font-size:17px;margin-bottom:12px;display:flex;gap:10px}
+.q .code{flex:none;font-size:11px;font-weight:600;color:var(--brand);background:var(--chip);border-radius:7px;padding:3px 7px;height:fit-content;margin-top:4px;letter-spacing:.04em}
+.q .hint{font-size:14px;color:var(--muted);margin:-6px 0 12px}
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.opt span{display:block;padding:11px 18px;border-radius:12px;background:var(--chip);border:1.5px solid transparent;font-weight:500;transition:.15s;user-select:none}
+.opt:hover span{background:var(--chip-hover)}
+.opt input:focus-visible+span{outline:3px solid var(--brand-2);outline-offset:2px}
+.opt input:checked+span{background:var(--brand);color:#fff;border-color:var(--brand);transform:translateY(-1px);box-shadow:0 6px 16px -6px var(--brand)}
+@media (prefers-color-scheme:dark){.opt input:checked+span{color:#08171b}}
+.likert{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.likert .opt span{text-align:center;padding:12px 4px 10px;font-size:13px;line-height:1.25;height:100%}
+.likert .opt span em{display:block;font-style:normal;font-family:Fraunces,serif;font-size:20px;margin-bottom:2px}
+@media (max-width:600px){
+  .likert{grid-template-columns:1fr}
+  .likert .opt span{display:flex;gap:12px;align-items:center;text-align:left;padding:12px 16px;font-size:15px}
+  .likert .opt span em{margin:0;width:22px}
+}
+.scale-note{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:2px 2px 8px}
+@media (max-width:600px){.scale-note{display:none}}
+.text{width:100%;margin-top:10px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
+.text:focus{outline:3px solid var(--brand-2);outline-offset:1px}
+.q.error .label{color:var(--err)}
+.q.error{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.msg{display:none;margin-top:8px;font-size:14px;color:var(--err);font-weight:500}
+.q.error .msg{display:block}
+.notice{margin:18px 0 0;padding:16px 18px;border-radius:14px;background:rgba(179,38,30,.09);border:1px solid rgba(179,38,30,.35);color:var(--ink)}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+button.btn{font:inherit;font-weight:600;border:0;border-radius:14px;padding:14px 26px;cursor:pointer;transition:.15s}
+.btn.primary{background:var(--brand);color:#fff;box-shadow:0 8px 20px -8px var(--brand)}
+@media (prefers-color-scheme:dark){.btn.primary{color:#08171b}}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn.primary:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink)}
+.done{text-align:center;padding:20px 0}
+.check{width:84px;height:84px;margin:0 auto 22px}
+.check circle{fill:none;stroke:var(--ok);stroke-width:4;stroke-dasharray:252;stroke-dashoffset:252;animation:draw .7s .1s forwards}
+.check path{fill:none;stroke:var(--ok);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .7s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.hp{position:absolute;left:-9999px}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:26px}
+.demo{background:var(--accent);color:#fff;text-align:center;font-size:13px;padding:6px;font-weight:500}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="demo" class="demo" hidden>Preview mode: no Google Sheet connected yet, so answers are not being saved. See SETUP.md.</div>
+<div class="wrap">
+  <header class="top">
+    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16" cy="16" r="12"/><path d="M16 9v14M12 12.5c0-1.4 1.6-2.5 4-2.5s4 1.1 4 2.5-1.6 2.3-4 2.5-4 1.1-4 2.5 1.6 2.5 4 2.5 4-1.1 4-2.5"/></svg>
+    Student Financial Wellbeing Study
+  </header>
+
+  <div class="progress" id="progress" hidden>
+    <div class="meta"><span id="stepName"></span><span id="stepCount"></span></div>
+    <div class="bar"><i id="barFill"></i></div>
+  </div>
+
+  <main id="app" aria-live="polite"></main>
+  <footer>Excelsia University College &middot; EC Approval No. STU-26-PD-SS-242 &middot; Anonymous &amp; voluntary</footer>
+</div>
+
+<script>
+/* ================== CONFIG ================== */
+// This is the Apps Script Web App URL that was tested in your browser.
+// If you create a new deployment, replace this URL with its new /exec URL.
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbxxxxjAUn4TcMFgvvVHTsZf1ptKcErABi9IhmRVYvTwT7Frk2hDmyPWVwZ1bpSAgg27/exec";
+
+/* ================== QUESTIONNAIRE ================== */
+const LIK = ["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"];
+const YN = ["Yes","No"];
+
+const sections = [
+  { id:"A", title:"About you", sub:"Screening and demographic information", questions:[
+    {id:"A1", text:"Are you currently a Nepalese international student enrolled at a university in Greater Sydney?", type:"choice", options:YN},
+    {id:"A2", text:"Are you 18 years of age or older?", type:"choice", options:YN},
+    {id:"A3", text:"What is your gender?", type:"choice", options:["Male","Female","Prefer not to say"]},
+    {id:"A4", text:"What is your age group?", type:"choice", options:["18–22","23–27","28–32","33 or above"]},
+    {id:"A5", text:"What is your current level of study?", type:"choice", options:["Undergraduate","Postgraduate coursework","Postgraduate research","Doctoral"]},
+    {id:"A6", text:"How long have you been living in Australia?", type:"choice", options:["Less than 6 months","6–12 months","1–2 years","More than 2 years"]},
+    {id:"A7", text:"What is your current living arrangement?", type:"choice", options:["Living alone","Living with relatives","Sharing with friends or housemates","University or student accommodation","Other"], other:true},
+    {id:"A8", text:"Are you currently engaged in any paid work?", type:"choice", options:YN},
+    {id:"A8a", text:"Approximately how many hours of paid work do you usually undertake in a typical week?", type:"choice", options:["1–10 hours","11–20 hours","21–30 hours","More than 30 hours","My work hours vary considerably","Prefer not to say"], showIf:a=>a.A8==="Yes"},
+    {id:"A9", text:"How would you describe your current financial situation overall?", type:"choice", options:["Very difficult","Difficult","Neutral","Comfortable","Very comfortable"]},
+  ]},
+  { id:"B", title:"Parental support", sub:"How much do you agree with each statement?", questions:[
+    {id:"PS1", text:"I receive financial support from my parents or guardians on a regular basis."},
+    {id:"PS2", text:"The financial support I receive from my parents or guardians is sufficient to help me manage my essential living expenses in Sydney."},
+    {id:"PS3", text:"I can rely on my parents or guardians for financial help when I face unexpected expenses."},
+  ]},
+  { id:"C", title:"Financial attitude", sub:"How much do you agree with each statement?", questions:[
+    {id:"FA1", text:"I often worry about whether I will have enough money to cover my expenses."},
+    {id:"FA2", text:"Thinking about my financial situation makes me feel stressed or anxious."},
+    {id:"FA3", text:"Financial concerns regularly interfere with my ability to focus on my studies."},
+    {id:"FA4", text:"I am confident in my ability to make good financial decisions."},
+    {id:"FA5", text:"I feel capable of managing my money effectively while studying in Sydney."},
+    {id:"FA6", text:"When I set a spending plan for myself, I am able to stick to it."},
+    {id:"FA7", text:"Saving money is important to me, even when my income is limited."},
+    {id:"FA8", text:"I consider future financial needs before spending money on non-essential items."},
+    {id:"FA9", text:"I regularly think about how my current spending will affect my financial situation in the future."},
+  ]},
+  { id:"D", title:"Financial strategy", sub:"How much do you agree with each statement?", questions:[
+    {id:"FST1", text:"I keep a budget or spending plan for my regular expenses."},
+    {id:"FST2", text:"I track how much money I spend each week or month."},
+    {id:"FST3", text:"I set financial goals for myself, such as saving for rent, tuition, or emergencies."},
+    {id:"FST4", text:"I regularly set aside a portion of my income as savings, even when my finances are tight."},
+    {id:"FST5", text:"I prepare in advance for unexpected expenses by building an emergency fund."},
+    {id:"FST6", text:"I make deliberate efforts to avoid unnecessary debt or overdue payments."},
+  ]},
+  { id:"E", title:"Financial support", sub:"How much do you agree with each statement?", questions:[
+    {id:"FSP1", text:"I have family or friends I can turn to for financial help in difficult times."},
+    {id:"FSP2", text:"I have people I can ask for advice when I face money-related problems."},
+    {id:"FSP3", text:"I know where to access financial assistance or support services when I need them."},
+    {id:"FSP4", text:"University or community support services are accessible to me when I need financial help."},
+    {id:"FSP5", text:"I feel that I have enough support around me to help me manage financial difficulties."},
+  ]},
+  { id:"F", title:"Spending behaviour", sub:"How much do you agree with each statement?", questions:[
+    {id:"SB1", text:"I sometimes make purchases without planning to buy them."},
+    {id:"SB2", text:"I often make purchases based on immediate wants rather than actual needs."},
+    {id:"SB3", text:"I find it difficult to control my spending when I see something I want."},
+    {id:"SB4", text:"I prioritise essential expenses such as rent, food, and transport before discretionary spending."},
+    {id:"SB5", text:"I think carefully about whether a purchase is necessary before spending money."},
+    {id:"SB6", text:"I try to allocate my money in a way that helps me meet my most important needs first."},
+    {id:"SB7", text:"I actively adjust my spending when my work hours or income are lower than expected."},
+    {id:"SB8", text:"When my income is unexpectedly reduced, I systematically cut back on non-essential spending."},
+    {id:"SB9", text:"I plan my spending carefully because my earning opportunities are restricted while I am studying."},
+  ]},
+  { id:"G", title:"Almost done", sub:"One quick check and one last question", questions:[
+    {id:"AC1", text:"To show that you are paying attention, please select “Agree” for this statement."},
+    {id:"H1", text:"Would you be interested in receiving a summary of the findings of this research after the study is completed?", type:"choice", options:YN},
+  ]},
+];
+// Any question without a type is a 5-point Likert item.
+sections.forEach(s=>s.questions.forEach(q=>{ if(!q.type){q.type="likert"; q.options=LIK;} }));
+
+/* ================== STATE ================== */
+const app = document.getElementById("app");
+const KEY = "swb_survey_v1";
+let state = { step:-1, answers:{}, consent:false, start:null, rid:null, submitted:false };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if(s && !s.submitted){ state = s; } } catch(e){}
+if(!state.rid) state.rid = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2));
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} };
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+if(!ENDPOINT) $("#demo").hidden = false;
+
+const screenedOut = () => state.answers.A1==="No" || state.answers.A2==="No";
+const visibleQs = s => s.questions.filter(q=>!q.showIf || q.showIf(state.answers));
+
+/* ================== RENDER ================== */
+function setProgress(){
+  const p = $("#progress");
+  if(state.step<0 || state.step>=sections.length){ p.hidden=true; return; }
+  p.hidden=false;
+  const s = sections[state.step];
+  $("#stepName").textContent = s.title;
+  $("#stepCount").textContent = `Part ${state.step+1} of ${sections.length}`;
+  $("#barFill").style.width = ((state.step)/sections.length*100 + 100/sections.length*0.5)+"%";
+}
+
+function render(){
+  setProgress();
+  if(state.step===-1) return renderWelcome();
+  if(state.step>=sections.length) return renderDone();
+  renderSection(sections[state.step]);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderWelcome(){
+  app.innerHTML = `
+  <section class="card">
+    <div class="eyebrow">Research survey</div>
+    <h1>How do Nepalese students in Sydney manage their money?</h1>
+    <p class="lede">Thank you for helping with this study. We want to understand the financial experiences, attitudes and habits of Nepalese international students studying in Greater Sydney.</p>
+    <div class="facts">
+      <div class="fact"><b>~8 min</b><span>to complete</span></div>
+      <div class="fact"><b>Anonymous</b><span>no name or email asked</span></div>
+      <div class="fact"><b>Voluntary</b><span>stop any time</span></div>
+    </div>
+    <div class="about">
+      <h3>About this study</h3>
+      <p><b>Researcher:</b> Sandeep Sharma, Excelsia University College<br>
+      <b>Contact:</b> <a href="mailto:2543463862@student.excelsia.edu.au">2543463862@student.excelsia.edu.au</a></p>
+      <p>This study has been approved by the Excelsia University College Ethics Committee in accordance with the <i>National Statement on Ethical Conduct in Human Research (2025)</i>.<br>
+      <b>EC Approval Number: STU-26-PD-SS-242</b></p>
+      <p>Your participation is voluntary and anonymous. Data is stored securely and handled in line with Excelsia University College policies and relevant privacy legislation. Concerns about the conduct of this research can be directed to the Ethics Committee at <a href="mailto:research@excelsia.edu.au">research@excelsia.edu.au</a>, quoting the approval number above.</p>
+    </div>
+    <label class="consent"><input type="checkbox" id="consent" ${state.consent?"checked":""}>
+      <span>I have read the information above. I understand that taking part is voluntary and anonymous, and I agree to participate.</span></label>
+    <div class="nav"><span></span><button class="btn primary" id="start" ${state.consent?"":"disabled"}>Start survey →</button></div>
+  </section>`;
+  $("#consent").onchange = e => { state.consent=e.target.checked; $("#start").disabled=!state.consent; save(); };
+  $("#start").onclick = () => { state.step=0; state.start=state.start||Date.now(); save(); render(); };
+}
+
+function qHTML(q,i){
+  const val = state.answers[q.id];
+  const name = "q_"+q.id;
+  const opts = q.options.map((o,idx)=>{
+    const v = q.type==="likert" ? String(idx+1) : o;
+    const checked = String(val)===v ? "checked" : "";
+    const inner = q.type==="likert" ? `<em>${idx+1}</em>${esc(o)}` : esc(o);
+    return `<label class="opt"><input type="radio" name="${name}" value="${esc(v)}" ${checked}><span>${inner}</span></label>`;
+  }).join("");
+  const other = q.other ? `<input class="text" id="other_${q.id}" placeholder="Please specify (optional)" maxlength="120" value="${esc(state.answers[q.id+"_other"]||"")}" ${val==="Other"?"":"hidden"}>` : "";
+  return `<div class="q" data-q="${q.id}">
+    <div class="label"><span class="code">${q.id}</span><span>${esc(q.text)}</span></div>
+    <div class="${q.type==="likert"?"likert":"opts"}" role="radiogroup">${opts}</div>${other}
+    <div class="msg">Please choose an answer to continue.</div></div>`;
+}
+
+function renderSection(s){
+  const isLast = state.step===sections.length-1;
+  const qs = visibleQs(s);
+  const scaleNote = qs.some(q=>q.type==="likert") ? `<div class="scale-note"><span>1 = Strongly Disagree</span><span>5 = Strongly Agree</span></div>` : "";
+  app.innerHTML = `
+  <section class="card">
+    <div class="eyebrow">Section ${s.id}</div>
+    <h2>${esc(s.title)}</h2>
+    <p class="lede" style="margin:0 0 14px;font-size:16px">${esc(s.sub)}</p>
+    ${scaleNote}
+    <div id="qs">${qs.map(qHTML).join("")}</div>
+    <div id="notice"></div>
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="nav">
+      <button class="btn ghost" id="back" ${state.step===0?"hidden":""}>← Back</button>
+      <button class="btn primary" id="next">${isLast?"Submit survey":"Continue →"}</button>
+    </div></section>`;
+  bind(s);
+  checkScreen(s);
+}
+
+function bind(s){
+  app.querySelectorAll("input[type=radio]").forEach(r=>{
+    r.onchange = () => {
+      const qid = r.name.slice(2);
+      state.answers[qid] = r.value; save();
+      const qEl = r.closest(".q"); qEl.classList.remove("error");
+      const o = $("#other_"+qid); if(o) o.hidden = r.value!=="Other";
+      if(qid==="A8"){ // reveal / hide the follow-up
+        if(r.value==="No"){ delete state.answers.A8a; }
+        const keep = state.step; renderKeepScroll(); state.step=keep;
+        return;
+      }
+      checkScreen(s);
+    };
+  });
+  app.querySelectorAll(".text").forEach(t=>{ t.oninput = ()=>{ state.answers[t.id.replace("other_","")+"_other"]=t.value; save(); }; });
+  $("#back").onclick = ()=>{ state.step--; save(); render(); };
+  $("#next").onclick = ()=>next(s);
+}
+
+function renderKeepScroll(){ const y=window.scrollY; renderSection(sections[state.step]); window.scrollTo(0,y); }
+
+function checkScreen(s){
+  const n = $("#notice"); if(!n) return;
+  if(s.id==="A" && screenedOut()){
+    n.innerHTML = `<div class="notice"><b>Thank you for your interest.</b><br>This survey is open only to Nepalese international students aged 18 or over who are enrolled at a university in Greater Sydney, so we can’t continue with your responses. We appreciate your time.</div>`;
+    $("#next").disabled = true;
+  } else { n.innerHTML=""; $("#next").disabled=false; }
+}
+
+function next(s){
+  const missing = visibleQs(s).filter(q=>!state.answers[q.id]);
+  document.querySelectorAll(".q").forEach(e=>e.classList.toggle("error", missing.some(m=>m.id===e.dataset.q)));
+  if(missing.length){ $(`[data-q="${missing[0].id}"]`).scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  if(s.id==="A" && screenedOut()) return;
+  if(state.step===sections.length-1) return submit();
+  state.step++; save(); render();
+}
+
+async function submit(){
+  const btn = $("#next"); btn.disabled=true; btn.textContent="Submitting…";
+  const a = state.answers;
+  const payload = { ...a,
+    response_id: state.rid,
+    duration_seconds: Math.round((Date.now()-(state.start||Date.now()))/1000),
+    attention_check_passed: a.AC1==="4" ? "Yes" : "No",
+    website: $(".hp").value };
+  // Make sure hidden follow-ups don't leave stale values
+  if(a.A8!=="Yes") payload.A8a="";
+  if(a.A7!=="Other") payload.A7_other="";
+  try{
+    if(ENDPOINT){
+      // text/plain avoids a CORS preflight, which Apps Script doesn't answer.
+      await fetch(ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+    } else { console.log("Preview mode – would submit:", payload); await new Promise(r=>setTimeout(r,600)); }
+    state.submitted=true; state.step=sections.length;
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    render();
+  }catch(err){
+    btn.disabled=false; btn.textContent="Submit survey";
+    $("#notice").innerHTML = `<div class="notice">We couldn’t send your answers. Please check your connection and try again. Your responses have been kept.</div>`;
+  }
+}
+
+function renderDone(){
+  const wantsSummary = state.answers.H1==="Yes";
+  app.innerHTML = `
+  <section class="card done">
+    <svg class="check" viewBox="0 0 84 84"><circle cx="42" cy="42" r="40"/><path d="M26 43l11 11 21-23"/></svg>
+    <h2>Thank you for participating.</h2>
+    <p class="lede">Your survey submission has been sent. Your answers will help build a clearer picture of student financial wellbeing in Sydney.</p>
+    <p style="color:var(--muted);font-size:13px;margin-top:16px">The survey uses a secure submission connection. The website cannot independently verify the spreadsheet write, so the researcher will check that the response has been recorded.</p>
+    ${wantsSummary?`<div class="fact" style="margin:26px auto 0;max-width:460px;text-align:left"><b style="font-size:17px">Want the findings?</b><span style="font-size:14px">To receive a summary after the study is completed, please contact the researcher separately at <a href="mailto:2543463862@student.excelsia.edu.au" style="color:var(--brand)">2543463862@student.excelsia.edu.au</a>. Your contact details are not collected through or linked to your survey responses.</span></div>`:""}
+  </section>`;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+render();
+</script>
+</body>
+</html>
